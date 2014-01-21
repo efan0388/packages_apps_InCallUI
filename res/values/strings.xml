@@ -549,4 +549,11 @@
 
     <!-- Title for Select Account Dialog [CHAR LIMIT=30] -->
     <string name="select_account_dialog_title">Select Account</string>
+
+    <!-- Text for the onscreen "Blacklist" button -->
+    <string name="onscreenBlacklistText">Blacklist</string>
+
+    <!-- Blacklist confirmation dialog -->
+    <string name="blacklist_dialog_title">Add to blacklist</string>
+    <string name="blacklist_dialog_message">Future calls from <xliff:g id="number">%s</xliff:g> will be blocked</string>
 </resources>
