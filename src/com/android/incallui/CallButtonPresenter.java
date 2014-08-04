@@ -331,6 +331,10 @@ public class CallButtonPresenter extends Presenter<CallButtonPresenter.CallButto
             return;
         }
 
+        boolean canRecord = CallRecorder.getInstance().isEnabled() &&
+                CallList.getInstance().getActiveCall() != null;
+        ui.showRecording(canRecord);
+
         updateCallButtons(call, ui.getContext());
 
         ui.enableMute(call.can(android.telecom.Call.Details.CAPABILITY_MUTE));
@@ -500,6 +504,7 @@ public class CallButtonPresenter extends Presenter<CallButtonPresenter.CallButto
         void showHoldButton(boolean show);
         void enableHold(boolean enabled);
         void showSwapButton(boolean show);
+        void showRecording(boolean show);
         void showChangeToVideoButton(boolean show);
         void enableChangeToVideoButton(boolean enable);
         void showSwitchCameraButton(boolean show);

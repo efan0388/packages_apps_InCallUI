@@ -61,6 +61,7 @@ public class CallButtonFragment
     private ImageButton mMergeButton;
     private CompoundButton mPauseVideoButton;
     private ImageButton mOverflowButton;
+    private CallRecordingButton mRecordButton;
 
     private PopupMenu mAudioModePopup;
     private boolean mAudioModePopupVisible;
@@ -120,6 +121,9 @@ public class CallButtonFragment
         mPauseVideoButton.setOnClickListener(this);
         mOverflowButton = (ImageButton) parent.findViewById(R.id.overflowButton);
         mOverflowButton.setOnClickListener(this);
+
+        mRecordButton = (CallRecordingButton) parent.findViewById(R.id.recordButton);
+        mRecordButton.setOnClickListener(mRecordButton);
 
         return parent;
     }
@@ -329,6 +333,7 @@ public class CallButtonFragment
         mMergeButton.setEnabled(isEnabled);
         mPauseVideoButton.setEnabled(isEnabled);
         mOverflowButton.setEnabled(isEnabled);
+        mRecordButton.setEnabled(isEnabled);
     }
 
     @Override
@@ -404,6 +409,10 @@ public class CallButtonFragment
     public void showAddCallButton(boolean show) {
         Log.d(this, "show Add call button: " + show);
         mAddCallButton.setVisibility(show ? View.VISIBLE : View.GONE);
+    }
+
+    public void showRecording(boolean show) {
+        mRecordButton.setVisibility(show ? View.VISIBLE : View.GONE);
     }
 
     @Override

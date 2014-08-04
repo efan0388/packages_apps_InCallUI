@@ -160,6 +160,13 @@
             android:contentDescription="@string/onscreenOverflowText"
             android:visibility="gone" />
 
+        <com.android.incallui.CallRecordingButton
+            android:id="@+id/recordButton"
+            style="@style/InCallButton"
+            android:src="@drawable/ic_record_holo_dark"
+            android:contentDescription="@string/onscreenRecordText"
+            android:visibility="gone" />
+
     </LinearLayout>
 
 </LinearLayout>

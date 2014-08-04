@@ -24,8 +24,10 @@ import android.os.Message;
 import android.telecom.DisconnectCause;
 import android.telecom.Phone;
 import android.telecom.PhoneAccountHandle;
+import android.text.TextUtils;
 
 import java.util.Collections;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
@@ -588,5 +590,14 @@ public class CallList implements InCallPhoneListener {
         }
         Log.i(this, "no active call ");
         return false;
+    }
+
+    public Call getCallWithStateAndNumber(int state, String number) {
+        for (Call call : mCallById.values()) {
+            if (TextUtils.equals(call.getNumber(), number) && call.getState() == state) {
+                return call;
+            }
+        }
+        return null;
     }
 }

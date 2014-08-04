@@ -119,4 +119,7 @@
 
     <dimen name="conference_call_manager_padding_top">64dp</dimen>
     <dimen name="conference_call_manager_button_dimension">46dp</dimen>
+
+    <!-- Size of call recorder progress timer text -->
+    <dimen name="recording_progress_text_size">64dp</dimen>
 </resources>
