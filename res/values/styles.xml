@@ -107,7 +107,7 @@
     </style>
 
     <style name="InCallPopupMenuStyle" parent="@android:style/Theme.Material">
-        <item name="android:textColorPrimary">@color/incall_accent_color</item>
+        <item name="android:textColorPrimary">@color/popup_menu_color</item>
     </style>
 
     <style name="InCallActionBarStyle" parent="@android:style/Widget.Material.ActionBar">
