@@ -726,6 +726,7 @@ public class CallCardPresenter extends Presenter<CallCardPresenter.CallCardUi>
                 })
                 .setNegativeButton(R.string.pause_prompt_no, null)
                 .show();
+	}		
 
     private String getConferenceString(Call call) {
         boolean isGenericConference = call.can(
