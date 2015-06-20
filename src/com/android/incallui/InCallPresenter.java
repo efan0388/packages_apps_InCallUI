@@ -566,6 +566,9 @@ public class InCallPresenter implements CallList.Listener, InCallPhoneListener {
 
     public void cancelAccountSelection() {
         mAccountSelectionCancelled = true;
+        if(mCallList==null){
+           return; //TODO: what is exactly happening here.
+        }
         Call call = mCallList.getWaitingForAccountCall();
         if (call != null) {
             String callId = call.getId();
@@ -1178,7 +1181,7 @@ public class InCallPresenter implements CallList.Listener, InCallPhoneListener {
     }
 
     public void maybeStartRevealAnimation(Intent intent) {
-        if (intent == null || mInCallActivity != null) {
+        if (intent == null || mInCallActivity != null || mContext == null) {
             return;
         }
         final Bundle extras = intent.getBundleExtra(TelecomManager.EXTRA_OUTGOING_CALL_EXTRAS);
@@ -1223,6 +1226,7 @@ public class InCallPresenter implements CallList.Listener, InCallPhoneListener {
                 | Intent.FLAG_ACTIVITY_NO_USER_ACTION);
         if (newTask) {
             intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            //intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
         }
 
         intent.setClass(mContext, InCallActivity.class);
@@ -1373,16 +1377,17 @@ public class InCallPresenter implements CallList.Listener, InCallPhoneListener {
 
     private MaterialPalette getColorsFromPhoneAccountHandle(PhoneAccountHandle phoneAccountHandle) {
         int highlightColor = PhoneAccount.NO_HIGHLIGHT_COLOR;
-        if (phoneAccountHandle != null) {
-            final TelecomManager tm = getTelecomManager();
+        if (phoneAccountHandle == null || mContext == null) { //OMGFIX, serious need do this in better way.
+            return null;
+        }
+        final TelecomManager tm = getTelecomManager();
 
-            if (tm != null) {
-                final PhoneAccount account = tm.getPhoneAccount(phoneAccountHandle);
-                // For single-sim devices, there will be no selected highlight color, so the phone
-                // account will default to NO_HIGHLIGHT_COLOR.
-                if (account != null) {
-                    highlightColor = account.getHighlightColor();
-                }
+        if (tm != null) {
+            final PhoneAccount account = tm.getPhoneAccount(phoneAccountHandle);
+            // For single-sim devices, there will be no selected highlight color, so the phone
+            // account will default to NO_HIGHLIGHT_COLOR.
+            if (account != null) {
+                highlightColor = account.getHighlightColor();
             }
         }
         return new InCallUIMaterialColorMapUtils(
