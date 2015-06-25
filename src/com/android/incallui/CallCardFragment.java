@@ -85,6 +85,7 @@ public class CallCardFragment extends BaseFragment<CallCardPresenter, CallCardPr
     private ImageView mCallStateVideoCallIcon;
     private TextView mCallStateLabel;
     private TextView mCallTypeLabel;
+    private ImageView mHdAudioIcon;
     private View mCallNumberAndLabel;
     private ImageView mPhoto;
     private TextView mElapsedTime;
@@ -213,6 +214,7 @@ public class CallCardFragment extends BaseFragment<CallCardPresenter, CallCardPr
         mCallStateIcon = (ImageView) view.findViewById(R.id.callStateIcon);
         mCallStateVideoCallIcon = (ImageView) view.findViewById(R.id.videoCallIcon);
         mCallStateLabel = (TextView) view.findViewById(R.id.callStateLabel);
+        mHdAudioIcon = (ImageView) view.findViewById(R.id.hdAudioIcon);
         mCallNumberAndLabel = view.findViewById(R.id.labelAndNumber);
         mCallTypeLabel = (TextView) view.findViewById(R.id.callTypeLabel);
         mElapsedTime = (TextView) view.findViewById(R.id.elapsedTime);
@@ -544,10 +546,13 @@ public class CallCardFragment extends BaseFragment<CallCardPresenter, CallCardPr
             DisconnectCause disconnectCause,
             String connectionLabel,
             Drawable callStateIcon,
-            String gatewayNumber) {
+            String gatewayNumber,
+            boolean isWifi,
+            boolean isConference) {
         boolean isGatewayCall = !TextUtils.isEmpty(gatewayNumber);
         CharSequence callStateLabel = getCallStateLabelFromState(state, videoState,
-                sessionModificationState, disconnectCause, connectionLabel, isGatewayCall);
+                sessionModificationState, disconnectCause, connectionLabel, isGatewayCall, isWifi,
+                isConference);
 
         updateMoreMenuByCall(state);
         Log.v(this, "setCallState " + callStateLabel);
@@ -556,6 +561,10 @@ public class CallCardFragment extends BaseFragment<CallCardPresenter, CallCardPr
 
         if (TextUtils.equals(callStateLabel, mCallStateLabel.getText())) {
             // Nothing to do if the labels are the same
+            if (state == Call.State.ACTIVE || state == Call.State.CONFERENCED) {
+                mCallStateLabel.clearAnimation();
+                mCallStateIcon.clearAnimation();
+            }
             return;
         }
 
@@ -709,15 +718,18 @@ public class CallCardFragment extends BaseFragment<CallCardPresenter, CallCardPr
      *         2. Ongoing calls will display the name of the provider.
      *         3. Incoming calls will only display "Incoming via..." for accounts.
      *         4. Video calls, and session modification states (eg. requesting video).
+     *         5. Incoming and active Wi-Fi calls will show label provided by hint.
+     *
+     * TODO: Move this to the CallCardPresenter.
      */
     private CharSequence getCallStateLabelFromState(int state, int videoState,
             int sessionModificationState, DisconnectCause disconnectCause, String label,
-            boolean isGatewayCall) {
+            boolean isGatewayCall, boolean isWifi, boolean isConference) {
         final Context context = getView().getContext();
         CharSequence callStateLabel = null;  // Label to display as part of the call banner
 
-        boolean isSpecialCall = label != null;
-        boolean isAccount = isSpecialCall && !isGatewayCall;
+        boolean hasSuggestedLabel = label != null;
+        boolean isAccount = hasSuggestedLabel && !isGatewayCall;
 
         switch  (state) {
             case Call.State.IDLE:
@@ -726,7 +738,7 @@ public class CallCardFragment extends BaseFragment<CallCardPresenter, CallCardPr
             case Call.State.ACTIVE:
                 // We normally don't show a "call state label" at all in this state
                 // (but we can use the call state label to display the provider name).
-                if (isAccount) {
+                if ((isAccount || isWifi || isConference) && hasSuggestedLabel) {
                     callStateLabel = label;
                 } else if (sessionModificationState
                         == Call.SessionModificationState.REQUEST_FAILED) {
@@ -743,7 +755,7 @@ public class CallCardFragment extends BaseFragment<CallCardPresenter, CallCardPr
                 break;
             case Call.State.CONNECTING:
             case Call.State.DIALING:
-                if (isSpecialCall) {
+                if (hasSuggestedLabel && !isWifi) {
                     callStateLabel = context.getString(R.string.calling_via_template, label);
                 } else {
                     callStateLabel = context.getString(R.string.card_title_dialing);
@@ -754,7 +766,9 @@ public class CallCardFragment extends BaseFragment<CallCardPresenter, CallCardPr
                 break;
             case Call.State.INCOMING:
             case Call.State.CALL_WAITING:
-                if (isAccount) {
+                if (isWifi && hasSuggestedLabel) {
+                    callStateLabel = label;
+                } else if (isAccount) {
                     callStateLabel = context.getString(R.string.incoming_via_template, label);
                 } else if (VideoProfile.VideoState.isBidirectional(videoState)) {
                     callStateLabel = context.getString(R.string.notification_incoming_video_call);
@@ -852,6 +866,16 @@ public class CallCardFragment extends BaseFragment<CallCardPresenter, CallCardPr
     @Override
     public void setPhotoVisible(boolean isVisible) {
         mPhoto.setVisibility(isVisible ? View.VISIBLE : View.GONE);
+    }
+
+    /**
+     * Changes the visibility of the HD audio icon.
+     *
+     * @param visible {@code true} if the UI should show the HD audio icon.
+     */
+    @Override
+    public void showHdAudioIndicator(boolean visible) {
+        mHdAudioIcon.setVisibility(visible ? View.VISIBLE : View.GONE);
     }
 
     /**
